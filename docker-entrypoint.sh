@@ -33,7 +33,7 @@ fi
 if [ -z "${REFERENCE:-}" ]; then
     REFERENCE="resources/example_reference.mp3"
 else
-    wget $REFERENCE -O /tmp/reference.mp3
+    wget "$REFERENCE" -O /tmp/reference.mp3
     REFERENCE="/tmp/reference.mp3"
 fi
 
