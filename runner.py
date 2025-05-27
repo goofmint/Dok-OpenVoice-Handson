@@ -4,7 +4,6 @@ from openvoice import se_extractor
 from openvoice.api import ToneColorConverter
 import argparse
 import nltk
-import boto3
 
 nltk.download('averaged_perceptron_tagger_eng')
 
@@ -36,21 +35,7 @@ arg_parser.add_argument(
     help='リファレンスの音声',
 )
 
-arg_parser.add_argument('--s3-bucket', help='S3のバケットを指定します。')
-arg_parser.add_argument('--s3-endpoint', help='S3互換エンドポイントのURLを指定します。')
-arg_parser.add_argument('--s3-secret', help='S3のシークレットアクセスキーを指定します。')
-arg_parser.add_argument('--s3-token', help='S3のアクセスキーIDを指定します。')
-
 args = arg_parser.parse_args()
-
-s3 = None
-if args.s3_token and args.s3_secret and args.s3_bucket:
-    # S3クライアントの作成
-    s3 = boto3.client(
-        's3',
-        endpoint_url=args.s3_endpoint if args.s3_endpoint else None,
-        aws_access_key_id=args.s3_token,
-        aws_secret_access_key=args.s3_secret)
 
 ckpt_converter = 'checkpoints_v2/converter'
 device = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -87,8 +72,3 @@ for speaker_key in speaker_ids.keys():
         tgt_se=target_se, 
         output_path=save_path,
         message=encode_message)
-    if s3 is not None:
-        s3.upload_file(
-            Filename=save_path,
-            Bucket=args.s3_bucket,
-            Key=os.path.basename(save_path))
