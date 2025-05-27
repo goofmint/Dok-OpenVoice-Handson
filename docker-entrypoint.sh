@@ -24,7 +24,7 @@ fi
 
 # 言語
 if [ -z "${LANGUAGE:-}" ]; then
-	LANGUAGE="en"
+	LANGUAGE="EN"
 fi
 
 # リファレンスの音声
