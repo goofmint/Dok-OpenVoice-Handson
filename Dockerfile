@@ -1,27 +1,23 @@
 FROM continuumio/miniconda3
 
-# conda環境を作る
-RUN conda create -n openvoice python=3.9
+# 必要な環境変数をセットして conda activate を簡略化
+ENV CONDA_DEFAULT_ENV=openvoice
+ENV PATH=/opt/conda/envs/openvoice/bin:$PATH
 
-# activateできるように準備
-SHELL ["/bin/bash", "-c"]
-
-# パッケージインストールは conda環境内で行う
-RUN echo "conda activate openvoice" >> ~/.bashrc
-ENV PATH /opt/conda/envs/openvoice/bin:$PATH
-
-RUN apt-get update && \
-	apt-get install -y ffmpeg && \
-	mkdir /app /opt/artifact
+# conda環境と依存パッケージのインストール
+RUN conda create -n openvoice python=3.9 -y && \
+    conda clean -afy && \
+    apt-get update && \
+    apt-get install -y ffmpeg && \
+    mkdir -p /app /opt/artifact
 
 WORKDIR /app
 COPY . .
 
-# ここから conda環境前提でpip実行！
-RUN source ~/.bashrc && conda activate openvoice && \
-	pip install -e . && \
-	pip install argparse boto3 git+https://github.com/myshell-ai/MeloTTS.git && \
-	python -m unidic download
+# conda環境内で pip install を実行
+RUN pip install -e . && \
+    pip install argparse boto3 git+https://github.com/myshell-ai/MeloTTS.git && \
+    python -m unidic download
 
 RUN chmod +x /app/docker-entrypoint.sh
 
