@@ -18,7 +18,7 @@ COPY . .
 
 # conda環境内で pip install を実行
 RUN pip install -e . && \
-    pip install argparse git+https://github.com/myshell-ai/MeloTTS.git && \
+    pip install argparse boto3 git+https://github.com/myshell-ai/MeloTTS.git && \
     python -m unidic download && \
     wget https://myshell-public-repo-host.s3.amazonaws.com/openvoice/${CHECKPOINT} && \
     unar ${CHECKPOINT} && \
