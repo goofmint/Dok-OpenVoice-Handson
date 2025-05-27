@@ -55,7 +55,7 @@ src_path = f'{output_dir}/tmp.wav'
 
 speed = 1.0
 
-model = TTS(language=args.lang, device=device)
+model = TTS(language=args.lang.upper(), device=device)
 speaker_ids = model.hps.data.spk2id
 
 for speaker_key in speaker_ids.keys():
