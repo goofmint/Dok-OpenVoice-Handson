@@ -23,8 +23,8 @@ if [ -z "${TEXT:-}" ]; then
 fi
 
 # 言語
-if [ -z "${LANG:-}" ]; then
-	LANG="en"
+if [ -z "${LANGUAGE:-}" ]; then
+	LANGUAGE="en"
 fi
 
 # リファレンスの音声
@@ -41,11 +41,14 @@ else
 	wget "${REFERENCE}" -O "${LOCAL_REFERENCE}"
 fi
 
+echo "TEXT: ${TEXT}"
+echo "LANGUAGE: ${LANGUAGE}"
+echo "REFERENCE: ${REFERENCE}"
 
 cd /app
 conda run -n openvoice python3 runner.py \
 	--id="${SAKURA_TASK_ID}" \
 	--output="${SAKURA_ARTIFACT_DIR}" \
 	--text="${TEXT}" \
-	--lang="${LANG}" \
+	--lang="${LANGUAGE}" \
 	--reference="${LOCAL_REFERENCE}"
