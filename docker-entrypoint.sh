@@ -5,48 +5,47 @@ shopt -s nullglob
 
 export TZ=${TZ:-Asia/Tokyo}
 
-# アウトプット先ディレクトリ（自動付与） /opt/artifact固定です
+# アウトプット先ディレクトリ（自動付与）
 if [ -z "${SAKURA_ARTIFACT_DIR:-}" ]; then
-  echo "Environment variable SAKURA_ARTIFACT_DIR is not set" >&2
-  exit 1
+	echo "Environment variable SAKURA_ARTIFACT_DIR is not set" >&2
+	exit 1
 fi
 
 # DOKのタスクID（自動付与）
 if [ -z "${SAKURA_TASK_ID:-}" ]; then
-  echo "Environment variable SAKURA_TASK_ID is not set" >&2
-  exit 1
+	echo "Environment variable SAKURA_TASK_ID is not set" >&2
+	exit 1
 fi
 
-# 読み上げるテキスト（環境変数で指定）
+# 読み上げるテキスト
 if [ -z "${TEXT:-}" ]; then
-  echo "Environment variable PROMPT is not set" >&2
-  exit 1
+	TEXT="Hello, I am John Doe. This is an example voice."
 fi
 
 # 言語
 if [ -z "${LANG:-}" ]; then
-  echo "Environment variable LANG is not set" >&2
-  exit 1
+	LANG="en"
 fi
 
 # リファレンスの音声
+LOCAL_REFERENCE="/tmp/reference.mp3"
 if [ -z "${REFERENCE:-}" ]; then
-    REFERENCE="resources/example_reference.mp3"
+	# 指定がなければデフォルトの音声
+	cp "resources/example_reference.mp3" "${LOCAL_REFERENCE}"
+elif [[ "${REFERENCE}" =~ ^https://drive\.google\.com/file/d/([^/]+) ]]; then
+	# Google Driveの共有リンクなら、直接ダウンロードできるURLに変換
+	FILE_ID="${BASH_REMATCH[1]}"
+	wget "https://drive.usercontent.google.com/download?export=download&id=${FILE_ID}" -O "${LOCAL_REFERENCE}"
 else
-    wget "$REFERENCE" -O /tmp/reference.mp3
-    REFERENCE="/tmp/reference.mp3"
+	# それ以外なら普通にダウンロード
+	wget "${REFERENCE}" -O "${LOCAL_REFERENCE}"
 fi
 
 
-# S3_はすべてboto3用の環境変数です
 cd /app
 conda run -n openvoice python3 runner.py \
-	  --id="${SAKURA_TASK_ID}" \
-	  --output="${SAKURA_ARTIFACT_DIR}" \
-	  --text="${TEXT}" \
-	  --lang="${LANG}" \
-	  --reference="${REFERENCE}" \
-	  --s3-bucket="${S3_BUCKET:-}" \
-	  --s3-endpoint="${S3_ENDPOINT:-}" \
-	  --s3-secret="${S3_SECRET:-}" \
-	  --s3-token="${S3_TOKEN:-}"
+	--id="${SAKURA_TASK_ID}" \
+	--output="${SAKURA_ARTIFACT_DIR}" \
+	--text="${TEXT}" \
+	--lang="${LANG}" \
+	--reference="${LOCAL_REFERENCE}"
