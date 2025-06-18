@@ -43,7 +43,7 @@ fi
 
 echo "TEXT: ${TEXT}"
 echo "LANGUAGE: ${LANGUAGE}"
-echo "REFERENCE: ${REFERENCE}"
+echo "REFERENCE: ${LOCAL_REFERENCE}"
 
 cd /app
 conda run -n openvoice python3 runner.py \
