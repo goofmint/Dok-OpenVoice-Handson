@@ -23,8 +23,8 @@ if [ -z "${TEXT:-}" ]; then
 fi
 
 # 言語
-if [ -z "${LANGUAGE:-}" ]; then
-	LANGUAGE="EN"
+if [ -z "${LANG:-}" ]; then
+	LANG="EN"
 fi
 
 # リファレンスの音声
@@ -42,7 +42,7 @@ else
 fi
 
 echo "TEXT: ${TEXT}"
-echo "LANGUAGE: ${LANGUAGE}"
+echo "LANG: ${LANG}"
 echo "REFERENCE: ${LOCAL_REFERENCE}"
 
 cd /app
@@ -50,7 +50,7 @@ conda run -n openvoice python3 runner.py \
 	--id="${SAKURA_TASK_ID}" \
 	--output="${SAKURA_ARTIFACT_DIR}" \
 	--text="${TEXT}" \
-	--lang="${LANGUAGE}" \
+	--lang="${LANG}" \
 	--reference="${LOCAL_REFERENCE}" \
 	--s3-bucket="${S3_BUCKET:-}" \
 	--s3-endpoint="${S3_ENDPOINT:-}" \
